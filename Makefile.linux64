@@ -1,0 +1,21 @@
+#
+# A makefile borrowing heavily from project structure in anton's opengl tutorials.
+# 	- CMAKE is a pain in the ass, shoot me.
+# 
+# author: benschau
+#
+
+BIN = vizi-redo-edition
+CC = g++
+FLAGS = -Wall -pedantic -g
+INC = -I include/ 
+EXT_LIB = 
+SYS_LIB = -lGL -lz -lGLEW -lglfw -lassimp
+SRC = core/main.cpp \
+	  core/camera.cpp \
+	  core/model.cpp \
+      core/gl_utils.cpp 
+
+all:
+	${CC} ${FLAGS} -o ${BIN} ${SRC} ${INC} ${EXT_LIB} ${SYS_LIB}
+
