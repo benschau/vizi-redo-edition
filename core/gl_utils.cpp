@@ -256,15 +256,15 @@ init_shader( const char *filename, GLuint *shader_index, GLenum type )
     glGetShaderiv(*shader_index, GL_COMPILE_STATUS, &params);
     if (GL_TRUE != params) 
     {
-        gl_log_err("ERR: GL shader index %i did not compile.\n", *shader_index);
+        gl_log_err("(init_shader) ERR: GL shader index %i did not compile.\n", *shader_index);
         shader_info(*shader_index);
         return false;
     }
    
 #if DEBUG
-    printf("gl_utils::init_shader(): creating shader from %s...\n", filename);
+    printf("(init_shader): creating shader from %s...\n", filename);
 #endif
-    gl_log("gl_utils::init_shader(): creating shader from %s...\n", filename);
+    gl_log("(init_shader): creating shader from %s...\n", filename);
 
     return true;
 }
