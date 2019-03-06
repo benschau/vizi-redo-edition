@@ -11,15 +11,17 @@
 // system headers // 
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 #include <time.h>
+#include <fstream>
+#include <vector>
 
 // custom headers // 
 #include <gl_utils.h>
 
 #define GL_LOG_FILE "gl.log"
 #define GL_WINDOW_NAME "vizi-redo"
-#define MAX_SHADER_LENGTH 
+#define MAX_SHADER_LENGTH 262144
+#define MAX_SHADERINFO_LENGTH 2048
 
 /* ------------------------------------------ */
 // gl logging utilities //
@@ -31,7 +33,7 @@ restart_gl_log()
     FILE *file = fopen(GL_LOG_FILE, "w");
     if (!file) 
     {
-        fprintf(stderr, "ERR: Could not open GL_LOG_FILE at %s for writing.\n", GL_LOG_FILE);
+        fprintf(stderr, "(restart_gl_log) ERR: Could not open GL_LOG_FILE at %s for writing.\n", GL_LOG_FILE);
         return false;
     }
 
@@ -51,7 +53,7 @@ gl_log( const char *msg, ... )
     FILE *file = fopen(GL_LOG_FILE, "a");
     if (!file) 
     {
-        fprintf(stderr, "ERR: Could not open GL_LOG_FILE at %s for appending.\n", GL_LOG_FILE);
+        fprintf(stderr, "(gl_log) ERR: Could not open GL_LOG_FILE at %s for appending.\n", GL_LOG_FILE);
         return false;
     }
     
@@ -72,7 +74,7 @@ gl_log_err( const char *msg, ... )
     FILE *file = fopen(GL_LOG_FILE, "a");
     if (!file) 
     {
-        fprintf(stderr, "ERR: Could not open GL_LOG_FILE at %s for appending.\n", GL_LOG_FILE);
+        fprintf(stderr, "(gl_log_err) ERR: Could not open GL_LOG_FILE at %s for appending.\n", GL_LOG_FILE);
         return false;
     }
     
@@ -95,13 +97,13 @@ gl_log_err( const char *msg, ... )
 bool 
 start_gl()  
 {
-    gl_log("launching GLFW %s", glfwGetVersionString());
+    gl_log("(start_gl) launching GLFW %s", glfwGetVersionString());
     
     // setting up GLFW 
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit()) 
     {
-        fprintf(stderr, "ERR: Could not start GLFW3\n");
+        fprintf(stderr, "(start_gl) ERR: Could not start GLFW3\n");
         return false;
     }
 
@@ -109,7 +111,7 @@ start_gl()
 
     if (!g_window) 
     {
-        fprintf(stderr, "ERR: Could not open GLFW3 window.");
+        fprintf(stderr, "(start_gl) ERR: Could not open GLFW3 window.");
         return false;
     }
     
@@ -127,9 +129,9 @@ start_gl()
     const GLubyte *renderer = glGetString(GL_RENDERER);
     const GLubyte *version = glGetString(GL_VERSION);
 
-    printf("Renderer: %s\n", renderer);
-    printf("OpenGL version supported: %s\n", version);
-    gl_log("renderer: %s\nversion: %s\n", renderer, version);
+    printf("(startgl) Renderer: %s\n", renderer);
+    printf("(startgl) OpenGL version supported: %s\n", version);
+    gl_log("(startgl) renderer: %s\nversion: %s\n", renderer, version);
 
     return true;
 }
@@ -158,7 +160,7 @@ glfw_key_callback( GLFWwindow *window, int key, int scancode, int action, int mo
         switch (key) 
         {
             case GLFW_KEY_ESCAPE:
-                gl_log("TERM: suggesting nicely to GLFW to shut down...");
+                gl_log("(glfw_key_callback) TERM: suggesting nicely to GLFW to shut down...");
                 glfwSetWindowShouldClose(g_window, 1);
                 break;
             default:
@@ -188,4 +190,81 @@ _update_fps_counter( GLFWwindow *window )
     }
 
     frame_count++;
+}
+
+/* ------------------------------------------ */
+// shader utilities //
+/* ------------------------------------------ */
+std::string
+parse_glsl( const std::string filename ) 
+{
+    std::ifstream in(filename, std::ifstream::in);
+
+    if (!in)
+    {
+        fprintf(stderr, "(parse_glsl) ERR: Could not parse GLSL shader %s\n", filename.c_str());
+        return NULL;
+    }
+    
+    int curr_length = 0;
+    std::string line, glsl;
+    while (getline(in, line)) 
+    {
+        curr_length += line.size();
+        if (curr_length > MAX_SHADER_LENGTH) 
+        {
+            gl_log_err("(parse_glsl) ERR: Shader length is longer than the max shader length supported, %d\n", MAX_SHADER_LENGTH);
+        }
+        
+        glsl.append(line); 
+    }
+
+    in.close();
+
+    return glsl;
+}
+
+void 
+shader_info( GLuint shader_index ) 
+{
+    std::vector<char> buff(MAX_SHADERINFO_LENGTH);
+    glGetShaderInfoLog(shader_index, MAX_SHADERINFO_LENGTH, NULL, buff.data());
+    std::string log(begin(buff), end(buff));
+
+#if DEBUG
+    printf("(shader_info) shader info log for GL index: %i:\n\t%s\n", shader_index, log.c_str());
+#endif
+    gl_log("(shader_info) shader info log for GL index: %i:\n\t%s\n", shader_index, log.c_str());
+}
+
+bool 
+init_shader( const char *filename, GLuint *shader_index, GLenum type ) 
+{
+#if DEBUG
+    printf("(init_shader) creating shader from %s...\n", filename);
+#endif
+    gl_log("(init_shader) creating shader from %s...\n", filename);
+
+    std::string glsl = parse_glsl(filename);
+    *shader_index = glCreateShader(type);
+
+    const GLchar *p = (const GLchar *) glsl.c_str();
+    glShaderSource(*shader_index, 1, &p, NULL);
+    glCompileShader(*shader_index);
+    
+    int params = -1;
+    glGetShaderiv(*shader_index, GL_COMPILE_STATUS, &params);
+    if (GL_TRUE != params) 
+    {
+        gl_log_err("ERR: GL shader index %i did not compile.\n", *shader_index);
+        shader_info(*shader_index);
+        return false;
+    }
+   
+#if DEBUG
+    printf("gl_utils::init_shader(): creating shader from %s...\n", filename);
+#endif
+    gl_log("gl_utils::init_shader(): creating shader from %s...\n", filename);
+
+    return true;
 }
