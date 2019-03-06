@@ -26,20 +26,31 @@ GLFWwindow *g_window = NULL;
 int 
 main( int argc, char **argv ) 
 {
-    if (argc < 2) {
+    // TODO: Support more/better argument parsing. //
+    if (argc != 2) {
         printf("ERR: specify object file location\n");
         return -1;
-    }
+    } 
 
     restart_gl_log();
     start_gl();
         
+    // initialize meshes, shaders, camera //
     GLuint vao;
     uint point_count;
-    // load object file //
-    if (argc == 2) {
-        load_obj(argv[1], &vao, &point_count);
+    
+    if (!load_obj(argv[1], &vao, &point_count)) 
+    {
+        printf("ERR: failed to load object file from %s. Giving up...\n", argv[1]);
+        return -1;
     }
+    
+    // TODO: create shaders //
+    
+
+    // TODO: init camera //
+    
+   
 
     // enable GL functionality for model faces & depth testing //
     glEnable(GL_DEPTH_TEST);
