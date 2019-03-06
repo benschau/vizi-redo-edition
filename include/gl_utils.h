@@ -15,6 +15,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdarg.h>
+#include <string>
 
 // global variables //
 extern int g_gl_width;
@@ -34,6 +35,13 @@ void glfw_framebuffer_size_callback( GLFWwindow *window, int width, int height )
 void _update_fps_counter( GLFWwindow *window );
 
 // GLSL shader utilities //
+std::string parse_glsl( const std::string filename );
+void shader_info( GLuint shader_index );
+bool init_shader( const char *filename, GLuint *shader_index, GLenum type );
 
+// GL program utilities //
+GLuint parse_glprogram( const std::string filename );
+bool glprogram_info( GLuint prog );
+bool init_glprogram( GLuint vert, GLuint frag, GLuint *program );
 
 #endif

@@ -268,3 +268,25 @@ init_shader( const char *filename, GLuint *shader_index, GLenum type )
 
     return true;
 }
+
+/* ------------------------------------------ */
+// GL program utilities //
+/* ------------------------------------------ */
+GLuint 
+parse_glprogram( const std::string filename ) 
+{
+
+}
+
+bool 
+glprogram_info( GLuint prog ) 
+{
+
+}
+
+bool 
+init_glprogram( GLuint vert, GLuint frag, GLuint *program ) 
+{
+
+}
+

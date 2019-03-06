@@ -36,15 +36,15 @@ load_obj( const char *filename, GLuint *vao, uint *point_count )
         printf("\t%i materials\n",  scene->mNumMaterials);          
         printf("\t%i meshes\n",     scene->mNumMeshes);          
         printf("\t%i textures\n",   scene->mNumTextures);          
-#else
-        gl_log("Loading model...\n");
-        gl_log("\t%i animations\n", scene->mNumAnimations);          
-        gl_log("\t%i cameras\n",    scene->mNumCameras);          
-        gl_log("\t%i lights\n",     scene->mNumLights);          
-        gl_log("\t%i materials\n",  scene->mNumMaterials);          
-        gl_log("\t%i meshes\n",     scene->mNumMeshes);          
-        gl_log("\t%i textures\n",   scene->mNumTextures);          
 #endif
+    
+    gl_log("Loading model...\n");
+    gl_log("\t%i animations\n", scene->mNumAnimations);          
+    gl_log("\t%i cameras\n",    scene->mNumCameras);          
+    gl_log("\t%i lights\n",     scene->mNumLights);          
+    gl_log("\t%i materials\n",  scene->mNumMaterials);          
+    gl_log("\t%i meshes\n",     scene->mNumMeshes);          
+    gl_log("\t%i textures\n",   scene->mNumTextures);          
    
     const aiMesh *mesh = scene->mMeshes[0];
     
@@ -136,9 +136,9 @@ load_obj( const char *filename, GLuint *vao, uint *point_count )
 
 #if DEBUG
         printf("SUCCESS: finished loading mesh.\n");
-#else
-        gl_log("SUCCESS: finished loading mesh.\n");
 #endif
+    
+    gl_log("SUCCESS: finished loading mesh.\n");
 
     return true;
 }
