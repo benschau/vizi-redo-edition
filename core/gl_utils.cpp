@@ -97,7 +97,7 @@ gl_log_err( const char *msg, ... )
 bool 
 start_gl()  
 {
-    gl_log("(start_gl) launching GLFW %s", glfwGetVersionString());
+    gl_log("(start_gl) launching GLFW %s\n", glfwGetVersionString());
     
     // setting up GLFW 
     glfwSetErrorCallback(glfw_error_callback);
@@ -111,7 +111,7 @@ start_gl()
 
     if (!g_window) 
     {
-        fprintf(stderr, "(start_gl) ERR: Could not open GLFW3 window.");
+        fprintf(stderr, "(start_gl) ERR: Could not open GLFW3 window.\n");
         return false;
     }
     
@@ -129,9 +129,9 @@ start_gl()
     const GLubyte *renderer = glGetString(GL_RENDERER);
     const GLubyte *version = glGetString(GL_VERSION);
 
-    printf("(startgl) Renderer: %s\n", renderer);
-    printf("(startgl) OpenGL version supported: %s\n", version);
-    gl_log("(startgl) renderer: %s\nversion: %s\n", renderer, version);
+    printf("(start_gl) Renderer: %s\n", renderer);
+    printf("(start_gl) OpenGL version supported: %s\n", version);
+    gl_log("(start_gl) renderer: %s\nversion: %s\n", renderer, version);
 
     return true;
 }
