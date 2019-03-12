@@ -21,7 +21,7 @@
 #define GL_LOG_FILE "gl.log"
 #define GL_WINDOW_NAME "vizi-redo"
 #define MAX_SHADER_LENGTH 262144
-#define MAX_SHADERINFO_LENGTH 2048
+#define MAX_INFO_LENGTH 2048
 
 /* ------------------------------------------ */
 // gl logging utilities //
@@ -227,8 +227,8 @@ parse_glsl( const std::string filename )
 void 
 shader_info( GLuint shader_index ) 
 {
-    std::vector<char> buff(MAX_SHADERINFO_LENGTH);
-    glGetShaderInfoLog(shader_index, MAX_SHADERINFO_LENGTH, NULL, buff.data());
+    std::vector<char> buff(MAX_INFO_LENGTH);
+    glGetShaderInfoLog(shader_index, MAX_INFO_LENGTH, NULL, buff.data());
     std::string log(begin(buff), end(buff));
 
 #if DEBUG
@@ -262,9 +262,9 @@ init_shader( const char *filename, GLuint *shader_index, GLenum type )
     }
    
 #if DEBUG
-    printf("(init_shader): creating shader from %s...\n", filename);
+    printf("(init_shader) creating shader from %s...\n", filename);
 #endif
-    gl_log("(init_shader): creating shader from %s...\n", filename);
+    gl_log("(init_shader) creating shader from %s...\n", filename);
 
     return true;
 }
@@ -272,21 +272,45 @@ init_shader( const char *filename, GLuint *shader_index, GLenum type )
 /* ------------------------------------------ */
 // GL program utilities //
 /* ------------------------------------------ */
-GLuint 
-parse_glprogram( const std::string filename ) 
-{
-
-}
-
-bool 
+void
 glprogram_info( GLuint prog ) 
 {
+    std::vector<char> buff(MAX_INFO_LENGTH);
+    glGetProgramInfoLog(prog, MAX_INFO_LENGTH, NULL, buff.data());
+    std::string log(begin(buff), end(buff));
 
+#if DEBUG
+    printf("(glprogram_info) program info log for GL program index: %i:\n\t%s\n", prog, log.c_str());
+#endif
+    gl_log("(glprogram_info) program info log for GL program index: %i:\n\t%s\n", prog, log.c_str());
 }
 
 bool 
 init_glprogram( GLuint vert, GLuint frag, GLuint *program ) 
 {
+    *program = glCreateProgram();
 
+#if DEBUG
+    printf("(init_glprogram) created GL program at %u.\n", *program);
+#endif
+    gl_log("(init_glprogram) created GL program at %u.\n", *program);
+
+    glAttachShader(*program, vert);
+    glAttachShader(*program, frag);
+    glLinkProgram(*program);
+
+    GLint params = -1; 
+    glGetProgramiv(*program, GL_LINK_STATUS, &params);
+    
+    if (GL_TRUE != params) 
+    {
+        gl_log_err("(init_glprogram) ERR: GL shader index %i did not compile.\n", *program);
+        glprogram_info(*program);
+        return false;
+    }
+    
+    glDeleteShader(vert);
+    glDeleteShader(frag);
+
+    return true;
 }
-
