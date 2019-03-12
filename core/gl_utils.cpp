@@ -156,6 +156,9 @@ glfw_framebuffer_size_callback( GLFWwindow *window, int width, int height )
 void 
 glfw_key_callback( GLFWwindow *window, int key, int scancode, int action, int mods ) 
 {
+    // defining camera speed here for now, should be moved to camera.h //
+    GLfloat cam_speed = 0.05f;
+
     if (action == GLFW_PRESS) {
         switch (key) 
         {

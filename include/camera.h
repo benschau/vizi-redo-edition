@@ -28,7 +28,8 @@ struct Cam {
 extern Cam *camera;
 extern glm::mat4 view;
 
-void init_camera();
+void init_camera( glm::vec3 camera_pos, glm::vec3 camera_tgt );
+void move_camera();
 void destroy_camera();
 
 #endif 

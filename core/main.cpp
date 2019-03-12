@@ -49,8 +49,9 @@ main( int argc, char **argv )
      
 
     // TODO: init camera //
-    
-   
+    glm::vec3 camera_pos = glm::vec3(0.0, 0.0, 3.0); 
+    glm::vec3 camera_tgt = glm::vec3(0.0, 0.0, 1.0);
+    init_camera(camera_pos, camera_tgt); 
 
     // enable GL functionality for model faces & depth testing //
     glEnable(GL_DEPTH_TEST);
